@@ -323,19 +323,19 @@ SET(PLUGINS
 
     # Plugins that extend some libraries (incl. third-party ones)
 
-    widget/Editor
-    widget/EditorList
-    widget/MathMLViewer
-    widget/WebViewer
+    widget/EditorWidget
+    widget/GraphPanelWidget
+    widget/MathMLViewerWidget
+    widget/WebViewerWidget
 
     # Plugins that provide some generic features
 
-    editing/CoreEditing
+    editing/EditingView
 
     # Plugins that have dependencies on others
 
-    editing/CoreCellMLEditing
-    editing/CoreSEDMLEditing
+    editing/CellMLEditingView
+    editing/SEDMLEditingView
 
     # Selectable plugins
 
@@ -364,7 +364,7 @@ SET(PLUGINS
     solver/KINSOLSolver
     solver/SecondOrderRungeKuttaSolver
 
-    tool/CellMLTools
+    tools/CellMLTools
 
     # Sample plugins
 
@@ -526,7 +526,7 @@ ELSE()
         #       up. So, by copying them over, we are sure that the release/debug
         #       version of OpenCOR will work fine...
 
-        SET(MSVC_DIRNAME "C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/redist")
+        SET(MSVC_DIRNAME "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/redist")
 
         IF(NOT RELEASE_MODE)
             SET(MSVC_DIRNAME "${MSVC_DIRNAME}/Debug_NonRedist")
@@ -536,13 +536,13 @@ ELSE()
 
         IF(RELEASE_MODE)
             SET(ADDITIONAL_FILES
-                ${MSVC_DIRNAME}/Microsoft.VC120.CRT/msvcp120.dll
-                ${MSVC_DIRNAME}/Microsoft.VC120.CRT/msvcr120.dll
+                ${MSVC_DIRNAME}/Microsoft.VC140.CRT/msvcp140.dll
+                ${MSVC_DIRNAME}/Microsoft.VC140.CRT/vcruntime140.dll
             )
         ELSE()
             SET(ADDITIONAL_FILES
-                ${MSVC_DIRNAME}/Microsoft.VC120.DebugCRT/msvcp120d.dll
-                ${MSVC_DIRNAME}/Microsoft.VC120.DebugCRT/msvcr120d.dll
+                ${MSVC_DIRNAME}/Microsoft.VC140.DebugCRT/msvcp140d.dll
+                ${MSVC_DIRNAME}/Microsoft.VC140.DebugCRT/vcruntime140d.dll
             )
         ENDIF()
 
@@ -626,10 +626,8 @@ IF(WIN32)
         WINDOWS_DEPLOY_QT_LIBRARY(Qt5${QT_LIBRARY})
     ENDFOREACH()
 
-    MATH(EXPR ICU_MINOR_VERSION "${Qt5Widgets_VERSION_MINOR}-1")
-
     FOREACH(QT_LIBRARY icudt icuin icuuc)
-        WINDOWS_DEPLOY_QT_LIBRARY(${QT_LIBRARY}${Qt5Widgets_VERSION_MAJOR}${ICU_MINOR_VERSION})
+        WINDOWS_DEPLOY_QT_LIBRARY(${QT_LIBRARY}57)
     ENDFOREACH()
 
     # Qt plugins required by OpenCOR
@@ -713,9 +711,11 @@ ELSE()
     INSTALL(TARGETS ${CMAKE_PROJECT_NAME} RUNTIME DESTINATION bin)
 
     # System libraries required by OpenCOR
-    # Note: not needed on Ubuntu 14.04 LTS, but it is on Ubuntu 16.04 LTS...
 
     FOREACH(SYSTEM_LIBRARY app base interfaces pbutils reamer video)
+        # Library not needed on Ubuntu 14.04 LTS, but it is on (at least) Ubuntu
+        # 16.04 LTS
+
         SET(FULL_SYSTEM_LIBRARY ${CMAKE_SHARED_LIBRARY_PREFIX}gst${SYSTEM_LIBRARY}-0.10${CMAKE_SHARED_LIBRARY_SUFFIX}.0)
 
         GET_FILENAME_COMPONENT(REAL_FULL_SYSTEM_LIBRARY /usr/lib/x86_64-linux-gnu/${FULL_SYSTEM_LIBRARY} REALPATH)
@@ -724,6 +724,14 @@ ELSE()
                 DESTINATION lib
                 RENAME ${FULL_SYSTEM_LIBRARY})
     ENDFOREACH()
+
+    # Library needed on Ubuntu 14.04 LTS, but not on Ubuntu 16.06 LTS
+    # Note: this is due to our use of GCC/G++ 4.9+, which is not originally
+    #       present on Ubuntu 14.04 LTS...
+
+    INSTALL(FILES /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.22
+            DESTINATION lib
+            RENAME libstdc++.so.6)
 
     # Qt libraries required by OpenCOR
     # Note: unlike for Windows and OS X, we don't have a macro for deploying all
@@ -738,7 +746,15 @@ ELSE()
     ENDIF()
 
     FOREACH(QT_LIBRARY CLucene Core DBus Gui Help Multimedia MultimediaWidgets Network OpenGL Positioning PrintSupport Qml Quick Sensors Sql Svg ${TEST} WebChannel WebKit WebKitWidgets Widgets XcbQpa Xml XmlPatterns)
-        LINUX_DEPLOY_QT_LIBRARY(${CMAKE_SHARED_LIBRARY_PREFIX}Qt${QT_VERSION_MAJOR}${QT_LIBRARY}${CMAKE_SHARED_LIBRARY_SUFFIX}.${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}
+        IF(   "${QT_LIBRARY}" STREQUAL "WebKit"
+           OR "${QT_LIBRARY}" STREQUAL "WebKitWidgets")
+            SET(REAL_QT_LIBRARY_DIR ${QT_WEBKIT_LIBRARIES_DIR})
+        ELSE()
+            SET(REAL_QT_LIBRARY_DIR ${QT_LIBRARY_DIR})
+        ENDIF()
+
+        LINUX_DEPLOY_QT_LIBRARY(${REAL_QT_LIBRARY_DIR}
+                                ${CMAKE_SHARED_LIBRARY_PREFIX}Qt${QT_VERSION_MAJOR}${QT_LIBRARY}${CMAKE_SHARED_LIBRARY_SUFFIX}.${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}
                                 ${CMAKE_SHARED_LIBRARY_PREFIX}Qt${QT_VERSION_MAJOR}${QT_LIBRARY}${CMAKE_SHARED_LIBRARY_SUFFIX}.${QT_VERSION_MAJOR})
     ENDFOREACH()
 
@@ -747,11 +763,10 @@ ELSE()
         # Note: indeed, on Travis CI, the PPA we use doesn't have those
         #       libraries...
 
-        MATH(EXPR ICU_MINOR_VERSION "${Qt5Widgets_VERSION_MINOR}-1")
-
         FOREACH(QT_FILE icudata icui18n icuuc)
-            LINUX_DEPLOY_QT_LIBRARY(${CMAKE_SHARED_LIBRARY_PREFIX}${QT_FILE}${CMAKE_SHARED_LIBRARY_SUFFIX}.${Qt5Widgets_VERSION_MAJOR}${ICU_MINOR_VERSION}.1
-                                    ${CMAKE_SHARED_LIBRARY_PREFIX}${QT_FILE}${CMAKE_SHARED_LIBRARY_SUFFIX}.${Qt5Widgets_VERSION_MAJOR}${ICU_MINOR_VERSION})
+            LINUX_DEPLOY_QT_LIBRARY(${QT_LIBRARY_DIR}
+                                    ${CMAKE_SHARED_LIBRARY_PREFIX}${QT_FILE}${CMAKE_SHARED_LIBRARY_SUFFIX}.56.1
+                                    ${CMAKE_SHARED_LIBRARY_PREFIX}${QT_FILE}${CMAKE_SHARED_LIBRARY_SUFFIX}.56)
         ENDFOREACH()
     ENDIF()
 

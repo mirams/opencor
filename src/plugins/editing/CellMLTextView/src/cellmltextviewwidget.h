@@ -41,21 +41,16 @@ namespace OpenCOR {
 
 //==============================================================================
 
-namespace CoreCellMLEditing {
-    class CoreCellmlEditingWidget;
-}   // namespace CoreCellMLEditing
+namespace CellMLEditingView {
+    class CellmlEditingViewWidget;
+}   // namespace CellMLEditingView
 
 //==============================================================================
 
-namespace Editor {
-    class EditorWidget;
-}   // namespace Editor
-
-//==============================================================================
-
-namespace EditorList {
+namespace EditorWidget {
     class EditorListWidget;
-}   // namespace EditorList
+    class EditorWidget;
+}   // namespace EditorWidget
 
 //==============================================================================
 
@@ -72,7 +67,7 @@ namespace CellMLTextView {
 class CellmlTextViewWidgetData
 {
 public:
-    explicit CellmlTextViewWidgetData(CoreCellMLEditing::CoreCellmlEditingWidget *pEditingWidget,
+    explicit CellmlTextViewWidgetData(CellMLEditingView::CellmlEditingViewWidget *pEditingWidget,
                                       const QString &pSha1, const bool &pValid,
                                       const CellMLSupport::CellmlFile::Version &pCellmlVersion,
                                       QDomDocument pRdfNodes);
@@ -80,7 +75,7 @@ public:
 
     void retranslateUi();
 
-    CoreCellMLEditing::CoreCellmlEditingWidget * editingWidget() const;
+    CellMLEditingView::CellmlEditingViewWidget * editingWidget() const;
 
     QString sha1() const;
     void setSha1(const QString &pSha1);
@@ -93,7 +88,7 @@ public:
     QDomDocument rdfNodes() const;
 
 private:
-    CoreCellMLEditing::CoreCellmlEditingWidget *mEditingWidget;
+    CellMLEditingView::CellmlEditingViewWidget *mEditingWidget;
     QString mSha1;
     bool mValid;
     CellMLSupport::CellmlFile::Version mCellmlVersion;
@@ -122,10 +117,11 @@ public:
     void fileReloaded(const QString &pFileName);
     void fileRenamed(const QString &pOldFileName, const QString &pNewFileName);
 
-    Editor::EditorWidget * editor(const QString &pFileName) const;
+    EditorWidget::EditorWidget * editorWidget(const QString &pFileName) const;
+    CellMLEditingView::CellmlEditingViewWidget * editingWidget(const QString &pFileName) const;
 
-    bool isEditorUseable(const QString &pFileName) const;
-    bool isEditorContentsModified(const QString &pFileName) const;
+    bool isEditorWidgetUseable(const QString &pFileName) const;
+    bool isEditorWidgetContentsModified(const QString &pFileName) const;
 
     bool saveFile(const QString &pOldFileName, const QString &pNewFileName,
                   bool &pNeedFeedback);
@@ -140,14 +136,14 @@ private:
     bool mNeedLoadingSettings;
     QString mSettingsGroup;
 
-    CoreCellMLEditing::CoreCellmlEditingWidget *mEditingWidget;
+    CellMLEditingView::CellmlEditingViewWidget *mEditingWidget;
 
     QMap<QString, CellmlTextViewWidgetData *> mData;
 
     CellMLTextViewConverter mConverter;
     CellmlTextViewParser mParser;
 
-    QList<EditorList::EditorListWidget *> mEditorLists;
+    QList<EditorWidget::EditorListWidget *> mEditorLists;
 
     QMap<QString, QString> mPresentationMathmlEquations;
 
@@ -155,7 +151,7 @@ private:
 
     QString mContentMathmlEquation;
 
-    void commentOrUncommentLine(QScintillaSupport::QScintillaWidget *editor,
+    void commentOrUncommentLine(QScintillaSupport::QScintillaWidget *pEditorWidget,
                                 const int &pLineNumber,
                                 const bool &pCommentLine);
 
@@ -167,12 +163,12 @@ private:
     QString endOfPiecewiseStatement(int &pPosition) const;
     QString statement(const int &pPosition) const;
 
-private Q_SLOTS:
+private slots:
     void editorKeyPressed(QKeyEvent *pEvent, bool &pHandled);
 
     void updateViewer();
 
-    void selectFirstItemInEditorList(EditorList::EditorListWidget *pEditorList = 0);
+    void selectFirstItemInEditorList(EditorWidget::EditorListWidget *pEditorList = 0);
 
     void mathmlConversionDone(const QString &pContentMathml,
                               const QString &pPresentationMathml);

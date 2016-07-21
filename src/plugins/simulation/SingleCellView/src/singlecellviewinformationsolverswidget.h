@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// Single cell view information solvers widget
+// Single Cell view information solvers widget
 //==============================================================================
 
 #pragma once
@@ -109,7 +109,7 @@ private:
     void setPropertiesUnit(SingleCellViewInformationSolversWidgetData *pSolverData,
                            const QString &pVoiUnit);
 
-private Q_SLOTS:
+private slots:
     void solverChanged(Core::Property *pProperty);
 };
 

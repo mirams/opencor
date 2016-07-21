@@ -34,7 +34,7 @@ FOR /F "TOKENS=1,4" %%X IN ('qmake --version') DO (
     )
 )
 
-CALL "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
+CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\vcvarsx86_amd64.bat"
 
 CD build
 
@@ -44,7 +44,7 @@ IF DEFINED NinjaFound (
     SET CMakeGenerator=NMake Makefiles JOM
 )
 
-cmake -G "!CMakeGenerator!" -DSHOW_INFORMATION_MESSAGE=ON -DCMAKE_BUILD_TYPE=!CMakeBuildType! -DENABLE_TESTS=!EnableTests! ..
+cmake -G "!CMakeGenerator!" -DCMAKE_BUILD_TYPE=!CMakeBuildType! -DENABLE_TESTS=!EnableTests! ..
 
 SET ExitCode=!ERRORLEVEL!
 

@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// Raw CellML to CellML text converter
+// Raw CellML to CellML Text converter
 //==============================================================================
 
 #pragma once
@@ -150,6 +150,7 @@ private:
                                      const bool &pMustBePresent = true) const;
 
     bool processModelNode(const QDomNode &pDomNode);
+    QString processCommentString(const QString &pComment);
     void processCommentNode(const QDomNode &pDomNode);
     void processRdfNode(const QDomNode &pDomNode);
     bool processImportNode(const QDomNode &pDomNode);

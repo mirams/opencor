@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// QScintillaWidget class
+// QScintilla widget
 //==============================================================================
 
 #pragma once
@@ -130,12 +130,12 @@ private:
 
     void updateColors();
 
-Q_SIGNALS:
+signals:
     void canSelectAll(const bool &pCanSelectAll);
 
     void keyPressed(QKeyEvent *pEvent, bool &pHandled);
 
-private Q_SLOTS:
+private slots:
     void updateUi();
 
     void checkCanSelectAll();

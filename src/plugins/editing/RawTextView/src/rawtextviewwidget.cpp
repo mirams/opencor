@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// Raw text view widget
+// Raw Text view widget
 //==============================================================================
 
 #include "corecliutils.h"
@@ -43,7 +43,7 @@ RawTextViewWidget::RawTextViewWidget(QWidget *pParent) :
     mNeedLoadingSettings(true),
     mSettingsGroup(QString()),
     mEditor(0),
-    mEditors(QMap<QString, Editor::EditorWidget *>())
+    mEditors(QMap<QString, EditorWidget::EditorWidget *>())
 {
 }
 
@@ -94,7 +94,7 @@ void RawTextViewWidget::initialize(const QString &pFileName,
 {
     // Retrieve the editor associated with the given file, if any
 
-    Editor::EditorWidget *newEditor = mEditors.value(pFileName);
+    EditorWidget::EditorWidget *newEditor = mEditors.value(pFileName);
 
     if (!newEditor) {
         // No editor exists for the given file, so create one
@@ -103,21 +103,19 @@ void RawTextViewWidget::initialize(const QString &pFileName,
 
         Core::readFileContentsFromFile(pFileName, fileContents);
 
-        newEditor = new Editor::EditorWidget(fileContents,
-                                             !Core::FileManager::instance()->isReadableAndWritable(pFileName),
-                                             0, parentWidget());
+        newEditor = new EditorWidget::EditorWidget(fileContents,
+                                                   !Core::FileManager::instance()->isReadableAndWritable(pFileName),
+                                                   0, parentWidget());
 
-        // Keep track of our editor and add it to ourselves
+        // Keep track of our editor
 
         mEditors.insert(pFileName, newEditor);
-
-        layout()->addWidget(newEditor);
     }
 
     // Update our editor, if required
 
     if (pUpdate) {
-        Editor::EditorWidget *oldEditor = mEditor;
+        EditorWidget::EditorWidget *oldEditor = mEditor;
 
         mEditor = newEditor;
 
@@ -135,13 +133,6 @@ void RawTextViewWidget::initialize(const QString &pFileName,
         } else {
             newEditor->updateSettings(oldEditor);
         }
-
-        // Show/hide our editors
-
-        newEditor->show();
-
-        if (oldEditor && (newEditor != oldEditor))
-            oldEditor->hide();
 
         // Set our focus proxy to our 'new' editor and make sure that the latter
         // immediately gets the focus
@@ -166,7 +157,7 @@ void RawTextViewWidget::finalize(const QString &pFileName)
 {
     // Remove the editor, should there be one for the given file
 
-    Editor::EditorWidget *editor  = mEditors.value(pFileName);
+    EditorWidget::EditorWidget *editor  = mEditors.value(pFileName);
 
     if (editor) {
         // There is an editor for the given file name, so save our settings and
@@ -217,7 +208,7 @@ void RawTextViewWidget::fileRenamed(const QString &pOldFileName,
 {
     // The given file has been renamed, so update our editors mapping
 
-    Editor::EditorWidget *editor = mEditors.value(pOldFileName);
+    EditorWidget::EditorWidget *editor = mEditors.value(pOldFileName);
 
     if (editor) {
         mEditors.insert(pNewFileName, editor);
@@ -227,9 +218,9 @@ void RawTextViewWidget::fileRenamed(const QString &pOldFileName,
 
 //==============================================================================
 
-Editor::EditorWidget * RawTextViewWidget::editor(const QString &pFileName) const
+EditorWidget::EditorWidget * RawTextViewWidget::editorWidget(const QString &pFileName) const
 {
-    // Return the requested editor
+    // Return the requested editor widget
 
     return mEditors.value(pFileName);
 }
@@ -240,11 +231,12 @@ QList<QWidget *> RawTextViewWidget::statusBarWidgets() const
 {
     // Return our status bar widgets
 
-    if (mEditor)
+    if (mEditor) {
         return QList<QWidget *>() << mEditor->cursorPositionWidget()
                                   << mEditor->editingModeWidget();
-    else
+    } else {
         return QList<QWidget *>();
+    }
 }
 
 //==============================================================================

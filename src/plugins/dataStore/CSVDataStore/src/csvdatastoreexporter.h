@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// CSV data store exporter class
+// CSV data store exporter
 //==============================================================================
 
 #pragma once
@@ -40,7 +40,7 @@ public:
                                   DataStore::DataStore *pDataStore,
                                   DataStore::DataStoreData *pDataStoreData);
 
-    virtual void execute() const;
+    virtual void execute(QString &pErrorMessage) const;
 };
 
 //==============================================================================

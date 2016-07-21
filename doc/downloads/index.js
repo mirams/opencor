@@ -20,7 +20,7 @@ var jsonData = { "versions": [
                        }
                      ]
                    },
-                   { "major": 0, "minor": 0, "patch": 0, "day": 9, "month": 6, "year": 2016, "type": 2,
+                   { "major": 0, "minor": 0, "patch": 0, "day": 1, "month": 7, "year": 2016, "type": 2,
                      "platforms": [
                        { "name": "Windows", "supported": "Windows 7 and later",
                          "files": [
@@ -39,11 +39,12 @@ var jsonData = { "versions": [
                        }
                      ],
                      "changes": [
-                       { "change": "<strong>CellML support:</strong> can now detect a variable of integration no matter where it is defined in a model (see issue <a href=\"https://github.com/opencor/opencor/issues/995\">#995</a>)." },
-                       { "change": "<strong>Data stores:</strong> data export is now done in its own thread (ee issue <a href=\"https://github.com/opencor/opencor/issues/849\">#849</a>)." },
-                       { "change": "<strong>Text-based editing views:</strong> fixed a small problem with losing the focus and not being able to track changes to a file after having reloaded another file that depends on it (see issue <a href=\"https://github.com/opencor/opencor/issues/996\">#996</a>)." },
-                       { "change": "<strong>CellML Text view:</strong> allow the import / export of the CellML Text format from / to CellML from the command line (see issue <a href=\"https://github.com/opencor/opencor/issues/992\">#992</a>)." },
-                       { "change": "<strong>Third-party libraries:</strong> applied an official patch to <a href=\"https://riverbankcomputing.com/software/qscintilla/intro\">QScintilla</a> 2.9.2 following a (Mac) OS X issue (see issue <a href=\"https://github.com/opencor/opencor/issues/994\">#994</a>). Upgraded <a href=\"https://jquery.com/\">jQuery</a> to version 3.0.0 (see issue <a href=\"https://github.com/opencor/opencor/issues/1001\">#1001</a>) and <a href=\"http://qwt.sourceforge.net/\">Qwt</a> to version 6.1.3 (see issue <a href=\"https://github.com/opencor/opencor/issues/1002\">#1002</a>)." }
+                       { "change": "<strong>General:</strong> fixed an issue with switching from one file to another with the mouse over a button-like widget and the status bar visible resulting in some bad flickering (see issue <a href=\"https://github.com/opencor/opencor/issues/1027\">#1027</a>). Qt WebKit now uses the same version of ICU as Qt itself on Linux (see issue <a href=\"https://github.com/opencor/opencor/issues/1037\">#1037</a>)." },
+                       { "change": "<strong>PMR window:</strong> file exposures now include SED-ML files, if any (see issue <a href=\"https://github.com/opencor/opencor/issues/1032\">#1032</a>)." },
+                       { "change": "<strong>Editor widget:</strong> fixed a problem with the icon for the search options / magnifier looking wrong (see issue <a href=\"https://github.com/opencor/opencor/issues/1026\">#1026</a>)." },
+                       { "change": "<strong>Text-based editing views:</strong> fixed a small problem with switching editing views for the same file resulting in file changes (and other things) not being tracked anymore (see issue <a href=\"https://github.com/opencor/opencor/issues/1040\">#1040</a>)." },
+                       { "change": "<strong>Single Cell view:</strong> the variable of integration isn't listed in the popup menu of the Parameters panel anymore, if it isn't defined in the main CellML file (see issue <a href=\"https://github.com/opencor/opencor/issues/1030\">#1030</a>)." },
+                       { "change": "<strong>Third-party libraries:</strong> upgraded <a href=\"https://jquery.com/\">jQuery</a> to version 3.1.0 (see issue <a href=\"https://github.com/opencor/opencor/issues/1041\">#1041</a>) and <a href=\"http://www.llvm.org/\">LLVM</a> to version 3.8.1 (see issue <a href=\"https://github.com/opencor/opencor/issues/1036\">#1036</a>)." }
                      ]
                    },
                    { "major": 0, "minor": 4, "patch": 0, "day": 29, "month": 4, "year": 2015, "type": 0,

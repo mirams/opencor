@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// CellML annotation view widget
+// CellML Annotation view widget
 //==============================================================================
 
 #pragma once
@@ -79,7 +79,7 @@ private:
     QIntList mEditingWidgetSizes;
     QIntList mMetadataDetailsWidgetSizes;
 
-private Q_SLOTS:
+private slots:
     void editingWidgetSplitterMoved(const QIntList &pSizes);
     void metadataDetailsWidgetSplitterMoved(const QIntList &pSizes);
 };

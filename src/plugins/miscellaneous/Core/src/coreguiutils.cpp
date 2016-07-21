@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// GUI utilities
+// Core GUI utilities
 //==============================================================================
 
 #include "centralwidget.h"
@@ -98,7 +98,7 @@ QString allFilters(const QStringList &pFilters)
             ".*"
 #endif
             ")"
-           +(filters.isEmpty()?QString():";;"+filters.join(";;")) ;
+           +(filters.isEmpty()?QString():";;"+filters.join(";;"));
 }
 
 //==============================================================================

@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// Single cell view information parameters widget
+// Single Cell view information parameters widget
 //==============================================================================
 
 #include "cellmlfileruntime.h"
@@ -40,7 +40,9 @@ SingleCellViewInformationParametersWidget::SingleCellViewInformationParametersWi
     PropertyEditorWidget(false, pParent),
     mParameters(QMap<Core::Property *, CellMLSupport::CellmlFileRuntimeParameter *>()),
     mParameterActions(QMap<QAction *, CellMLSupport::CellmlFileRuntimeParameter *>()),
-    mSimulation(0)
+    mSimulation(0),
+    mNeedClearing(false),
+    mVoiAccessible(false)
 {
     // Create our context menu
 
@@ -65,9 +67,11 @@ void SingleCellViewInformationParametersWidget::retranslateContextMenu()
 {
     // Retranslate our context menu, in case it has been populated
 
-    if (mContextMenu->actions().count() >= 2) {
-        mContextMenu->actions()[0]->setText(tr("Plot Against Variable of Integration"));
-        mContextMenu->actions()[1]->setText(tr("Plot Against"));
+    if (mContextMenu->actions().count() >= mVoiAccessible+1) {
+        if (mVoiAccessible)
+            mContextMenu->actions()[0]->setText(tr("Plot Against Variable of Integration"));
+
+        mContextMenu->actions()[(mVoiAccessible?0:-1)+1]->setText(tr("Plot Against"));
     }
 }
 
@@ -97,6 +101,21 @@ void SingleCellViewInformationParametersWidget::initialize(SingleCellViewSimulat
 
     mSimulation = pSimulation;
 
+    // First clear ourselves, if needed
+
+    if (mNeedClearing) {
+        clear();
+
+        mNeedClearing = false;
+    }
+
+    // Check whether our model's variable of integration is among our model's
+    // parameters (i.e. it is defined in the main CellML file)
+
+    CellMLSupport::CellmlFileRuntime *runtime = pSimulation->runtime();
+
+    mVoiAccessible = runtime->parameters().contains(runtime->variableOfIntegration());
+
     // Retranslate our core self, if needed
     // Note: part of reloading ourselves consists of finalising ourselves, which
     //       means clearing all of our contents including our header labels. So,
@@ -108,8 +127,8 @@ void SingleCellViewInformationParametersWidget::initialize(SingleCellViewSimulat
 
     // Populate our property editor and context menu
 
-    populateModel(pSimulation->runtime());
-    populateContextMenu(pSimulation->runtime());
+    populateModel(runtime);
+    populateContextMenu(runtime);
 
     // Keep track of when some of the model's data has changed
 
@@ -124,7 +143,7 @@ void SingleCellViewInformationParametersWidget::finalize()
     // Clear ourselves, as well as our context menu, parameters and parameter
     // actions
 
-    clear();
+    mNeedClearing = true;
 
     mContextMenu->clear();
 
@@ -134,8 +153,7 @@ void SingleCellViewInformationParametersWidget::finalize()
 
 //==============================================================================
 
-void SingleCellViewInformationParametersWidget::updateParameters(const double &pCurrentPoint,
-                                                                 const bool &pProcessEvents)
+void SingleCellViewInformationParametersWidget::updateParameters(const double &pCurrentPoint)
 {
     // Update our data
 
@@ -171,19 +189,6 @@ void SingleCellViewInformationParametersWidget::updateParameters(const double &p
                 break;
             }
         }
-
-        // Make sure that we don't hang up the GUI unnecessarily
-        // Note #1: this is useful when we run a model with loads of parameters
-        //          since otherwise the simulation won't finish smoothly (see
-        //          issue #656)...
-        // Note #2: we don't want to process events all the time otherwise it
-        //          would mean that whenever we move the mouse while editing a
-        //          parameter, then the GUI would keep flashing because of the
-        //          editor closing and then reopening repeatedly until we stop
-        //          moving the mouse (see issue #733)...
-
-        if (pProcessEvents)
-            QCoreApplication::processEvents();
     }
 
     // Check whether any of our properties has actually been modified
@@ -260,7 +265,7 @@ void SingleCellViewInformationParametersWidget::populateModel(CellMLSupport::Cel
             // create a new section hierarchy for our 'new' component, reusing
             // existing sections, whenever possible
 
-            Core::Property *section = 0;
+            Core::Property *parentSectionProperty = 0;
 
             foreach (const QString &component, parameter->componentHierarchy()) {
                 // Check whether we already have a section for our current
@@ -272,11 +277,11 @@ void SingleCellViewInformationParametersWidget::populateModel(CellMLSupport::Cel
 
                 QList<Core::Property *> subSections = QList<Core::Property *>();
 
-                if (section) {
-                    // We have a section, so go through its children and keep
-                    // track of its propeties that are a section
+                if (parentSectionProperty) {
+                    // We have a parent section, so go through its children and
+                    // keep track of its propeties that are a section
 
-                    foreach (QObject *object, section->children()) {
+                    foreach (QObject *object, parentSectionProperty->children()) {
                         Core::Property *property = qobject_cast<Core::Property *>(object);
 
                         if (   property
@@ -309,11 +314,11 @@ void SingleCellViewInformationParametersWidget::populateModel(CellMLSupport::Cel
                 // be found
 
                 if (!sectionProperty)
-                    sectionProperty = addSectionProperty(component, section);
+                    sectionProperty = addSectionProperty(component, parentSectionProperty);
 
                 // Get ready for the next component in our component hierarchy
 
-                section = sectionProperty;
+                parentSectionProperty = sectionProperty;
             }
 
             // Keep track of the new component hierarchy
@@ -384,7 +389,7 @@ void SingleCellViewInformationParametersWidget::populateContextMenu(CellMLSuppor
 {
     // Create our two main menu items
 
-    QAction *voiAction = mContextMenu->addAction(QString());
+    QAction *voiAction = mVoiAccessible?mContextMenu->addAction(QString()):0;
     QMenu *plotAgainstMenu = new QMenu(mContextMenu);
 
     mContextMenu->addAction(plotAgainstMenu->menuAction());
@@ -394,14 +399,15 @@ void SingleCellViewInformationParametersWidget::populateContextMenu(CellMLSuppor
     retranslateContextMenu();
 
     // Create a connection to handle the graph requirement against our variable
-    // of integration
+    // of integration, and keep track of the parameter associated with our first
+    // main menu item
 
-    connect(voiAction, SIGNAL(triggered(bool)),
-            this, SLOT(emitGraphRequired()));
+    if (mVoiAccessible) {
+        connect(voiAction, SIGNAL(triggered(bool)),
+                this, SLOT(emitGraphRequired()));
 
-    // Keep track of the parameter associated with our first main menu item
-
-    mParameterActions.insert(voiAction, pRuntime->variableOfIntegration());
+        mParameterActions.insert(voiAction, pRuntime->variableOfIntegration());
+    }
 
     // Populate our context menu with the parameters
 

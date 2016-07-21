@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// Parser for the CellML text format
+// Parser for the CellML Text format
 //==============================================================================
 
 #pragma once
@@ -176,6 +176,7 @@ private:
     bool unitToken(QDomNode &pDomNode);
     bool usingToken(QDomNode &pDomNode);
 
+    QString processCommentString(const QString &pComment);
     void parseComments(QDomNode &pDomNode);
     bool parseCmetaId(QDomElement &pDomElement);
     bool parseModelDefinition(QDomNode &pDomNode);

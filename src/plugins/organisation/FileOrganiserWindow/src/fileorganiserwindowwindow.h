@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// File organiser window
+// File Organiser window
 //==============================================================================
 
 #pragma once
@@ -71,7 +71,7 @@ private:
 
     QMenu *mContextMenu;
 
-private Q_SLOTS:
+private slots:
     void on_actionNew_triggered();
     void on_actionDelete_triggered();
 

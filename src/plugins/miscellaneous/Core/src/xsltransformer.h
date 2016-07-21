@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// XSL transformation
+// XSL transformer
 //==============================================================================
 
 #pragma once
@@ -80,10 +80,10 @@ private:
 
     QList<XslTransformerJob> mJobs;
 
-Q_SIGNALS:
+signals:
     void done(const QString &pInput, const QString &pOutput);
 
-private Q_SLOTS:
+private slots:
     void started();
 };
 

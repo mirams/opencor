@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// Help widget
+// Help window widget
 //==============================================================================
 
 #pragma once
@@ -98,7 +98,7 @@ private:
 
 //==============================================================================
 
-class HelpWindowWidget : public WebViewer::WebViewerWidget,
+class HelpWindowWidget : public OpenCOR::WebViewerWidget::WebViewerWidget,
                          public Core::CommonWidget
 {
     Q_OBJECT
@@ -136,7 +136,7 @@ private:
 
     void setZoomLevel(const int &pZoomLevel);
 
-Q_SIGNALS:
+signals:
     void notHomePage(const bool &pNotHomePage);
 
     void backEnabled(const bool &pEnabled);
@@ -147,7 +147,7 @@ Q_SIGNALS:
     void notDefaultZoomLevel(const bool &pEnabled);
     void zoomOutEnabled(const bool &pEnabled);
 
-private Q_SLOTS:
+private slots:
     void urlChanged(const QUrl &pUrl);
 
     void selectionChanged();

@@ -694,7 +694,7 @@ void CentralWidget::updateFileTab(const int &pIndex, const bool &pIconOnly)
                                   QUrl(url).fileName():
                                   QFileInfo(fileName).fileName();
 
-        mFileTabs->setTabText(pIndex, tabText+(fileManagerInstance->isLocalNewOrModified(fileName)?
+        mFileTabs->setTabText(pIndex, tabText+(fileManagerInstance->isNewOrModified(fileName)?
                                                    "*":
                                                    QString()));
         mFileTabs->setTabToolTip(pIndex, fileIsNew?
@@ -1267,7 +1267,7 @@ bool CentralWidget::canCloseFile(const int &pIndex)
     FileManager *fileManagerInstance = FileManager::instance();
     QString fileName = mFileNames[pIndex];
 
-    if (fileManagerInstance->isLocalNewOrModified(fileName)) {
+    if (fileManagerInstance->isModified(fileName)) {
         // The current file is modified, so ask the user whether to save it or
         // ignore it
 
@@ -1791,22 +1791,21 @@ void CentralWidget::updateGui()
 
     emit guiUpdated(viewPlugin, fileName);
 
-    // Replace the current view with the new one
-    // Note #1: the order in which the adding and removing of view is done to
-    //          ensure that the replacement looks as good as possible...
-    // Note #2: to show/hide the status bar is to avoid some of the flickering
-    //          that results from switching from one file to another (both using
-    //          the same view) with the status bar visible and the mouse pointer
-    //          over a button-like widget within the current view (see
-    //          issue #405). It's not neat, but it seems like it might be an
-    //          issue with Qt itself...
+    // Replace the current view with the new one, if needed
+    // Note: to do this as smoothly as possible, we temporarily hide the status
+    //       bar. Indeed, not do this will result in some awful flickering when
+    //       switching from one file to another with the mouse over a
+    //       button-like widget and the status bar visible (see issues #405 and
+    //       #1027)...
 
-    bool statusBarVisible = mainWindow()->statusBar()->isVisible();
+    if (mContents->currentWidget() != newView) {
+        bool statusBarVisible = mainWindow()->statusBar()->isVisible();
 
-    mainWindow()->statusBar()->setVisible(false);
-        mContents->removeWidget(mContents->currentWidget());
-        mContents->addWidget(newView);
-    mainWindow()->statusBar()->setVisible(statusBarVisible);
+        mainWindow()->statusBar()->setVisible(false);
+            mContents->removeWidget(mContents->currentWidget());
+            mContents->addWidget(newView);
+        mainWindow()->statusBar()->setVisible(statusBarVisible);
+    }
 
     // Give the focus to the new view after first checking that it has a focused
     // widget
@@ -1842,6 +1841,13 @@ void CentralWidget::updateGui()
     emit atLeastTwoFiles(mFileTabs->count() > 1);
 
     mState = Idling;
+
+    // Our call to QCoreApplication::processEvents() may result in our file tab
+    // not being in sync with the contents of our view, in which case we need to
+    // update the latter by (re)updating our GUI
+
+    if (fileName.compare(currentFileName()))
+        updateGui();
 }
 
 //==============================================================================
@@ -1896,7 +1902,7 @@ void CentralWidget::fileChanged(const QString &pFileName,
     FileManager *fileManagerInstance = FileManager::instance();
 
     if (    (    pFileChanged
-             && !fileManagerInstance->isLocalNewOrModified(pFileName)
+             && !fileManagerInstance->isModified(pFileName)
              &&  fileManagerInstance->isDifferent(pFileName))
         || pDependenciesChanged) {
         // The given file and/or one or several of its dependencies has changed,
@@ -1989,16 +1995,16 @@ void CentralWidget::fileDeleted(const QString &pFileName)
 
 void CentralWidget::updateModifiedSettings()
 {
-    // Update all our file tabs and determine the number of new/modified files
+    // Update all our file tabs and determine the number of modified files
 
     FileManager *fileManagerInstance = FileManager::instance();
-    int nbOfLocalNewOrModifiedFiles = 0;
+    int nbOfModifiedFiles = 0;
 
     for (int i = 0, iMax = mFileTabs->count(); i < iMax; ++i) {
         updateFileTab(i);
 
-        if (fileManagerInstance->isLocalNewOrModified(mFileNames[i]))
-            ++nbOfLocalNewOrModifiedFiles;
+        if (fileManagerInstance->isNewOrModified(mFileNames[i]))
+            ++nbOfModifiedFiles;
     }
 
     // Reset the enabled state and tool tip of our Mode tabs and of all our View
@@ -2033,8 +2039,8 @@ void CentralWidget::updateModifiedSettings()
 
     // Let people know whether we can save the current file and/or all files
 
-    emit canSave(fileManagerInstance->isLocalNewOrModified(fileName));
-    emit canSaveAll(nbOfLocalNewOrModifiedFiles);
+    emit canSave(fileManagerInstance->isNewOrModified(fileName));
+    emit canSaveAll(nbOfModifiedFiles);
 }
 
 //==============================================================================

@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// PMR widget
+// PMR window widget
 //==============================================================================
 
 #pragma once
@@ -40,7 +40,7 @@ namespace PMRWindow {
 
 //==============================================================================
 
-class PmrWindowWidget : public WebViewer::WebViewerWidget,
+class PmrWindowWidget : public OpenCOR::WebViewerWidget::WebViewerWidget,
                         public Core::CommonWidget
 {
     Q_OBJECT
@@ -80,18 +80,18 @@ private:
 
     QString message() const;
 
-Q_SIGNALS:
+signals:
     void cloneWorkspaceRequested(const QString &pUrl);
     void showExposureFilesRequested(const QString &pUrl);
 
     void openExposureFileRequested(const QString &pUrl);
 
-public Q_SLOTS:
+public slots:
     void addExposureFiles(const QString &pUrl,
                           const QStringList &pExposureFiles);
     void showExposureFiles(const QString &pUrl, const bool &pShow = true);
 
-private Q_SLOTS:
+private slots:
     void copy();
 
     void linkClicked();

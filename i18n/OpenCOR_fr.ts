@@ -4,8 +4,8 @@
 <context>
     <name>CheckForUpdatesWindow</name>
     <message>
-        <source>Check for updates...</source>
-        <translation>Vérifier pour des mises à jour...</translation>
+        <source>Check For Updates</source>
+        <translation>Vérifier Pour Des Mises À Jour</translation>
     </message>
     <message>
         <source>Recheck</source>
@@ -155,8 +155,8 @@
         <translation>Quitter OpenCOR</translation>
     </message>
     <message>
-        <source>Check for Updates...</source>
-        <translation>Vérifier pour des Mises à Jour...</translation>
+        <source>Check For Updates...</source>
+        <translation>Vérifier Pour Des Mises À Jour...</translation>
     </message>
     <message>
         <source>Check for updates</source>
@@ -197,16 +197,16 @@
         <translation>Extensions</translation>
     </message>
     <message>
-        <source>No plugin could be found.</source>
-        <translation>Aucune extension n&apos;a pu être trouvée.</translation>
-    </message>
-    <message>
         <source>About</source>
         <translation>À Propos</translation>
     </message>
     <message>
         <source>You are about to reset &lt;strong&gt;all&lt;/strong&gt; of your settings. Do you wish to proceed?</source>
         <translation>Vous êtes sur le point de réinitialiser &lt;strong&gt;tous&lt;/strong&gt; vos paramètres. Voulez-vous continuer ?</translation>
+    </message>
+    <message>
+        <source>No plugins could be found.</source>
+        <translation>Aucunes extensions n&apos;ont pu être trouvées.</translation>
     </message>
 </context>
 <context>
@@ -385,12 +385,12 @@
         <translation>extensions pour stocker et manipuler des données.</translation>
     </message>
     <message>
-        <source>Tool</source>
-        <translation>Outil</translation>
-    </message>
-    <message>
         <source>plugins to access various tools.</source>
         <translation>extensions pour accéder différents outils.</translation>
+    </message>
+    <message>
+        <source>Tools</source>
+        <translation>Outils</translation>
     </message>
 </context>
 <context>

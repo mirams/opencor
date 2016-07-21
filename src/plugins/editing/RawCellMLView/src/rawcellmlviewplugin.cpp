@@ -17,9 +17,10 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// RawCellMLView plugin
+// Raw CellML view plugin
 //==============================================================================
 
+#include "cellmleditingviewwidget.h"
 #include "cellmlfilemanager.h"
 #include "cellmlsupportplugin.h"
 #include "corecliutils.h"
@@ -48,7 +49,7 @@ PLUGININFO_FUNC RawCellMLViewPluginInfo()
     descriptions.insert("fr", QString::fromUtf8("une extension pour éditer des fichiers <a href=\"http://www.cellml.org/\">CellML</a> à l'aide d'un éditeur XML."));
 
     return new PluginInfo("Editing", true, false,
-                          QStringList() << "CoreCellMLEditing",
+                          QStringList() << "CellMLEditingView",
                           descriptions);
 }
 
@@ -81,16 +82,16 @@ bool RawCellMLViewPlugin::validCellml(const QString &pFileName,
 // Editing interface
 //==============================================================================
 
-Editor::EditorWidget * RawCellMLViewPlugin::editor(const QString &pFileName) const
+EditorWidget::EditorWidget * RawCellMLViewPlugin::editorWidget(const QString &pFileName) const
 {
-    // Return the requested editor
+    // Return the requested editor widget
 
-    return mViewWidget->editor(pFileName);
+    return mViewWidget->editorWidget(pFileName);
 }
 
 //==============================================================================
 
-bool RawCellMLViewPlugin::isEditorUseable(const QString &pFileName) const
+bool RawCellMLViewPlugin::isEditorWidgetUseable(const QString &pFileName) const
 {
     Q_UNUSED(pFileName);
 
@@ -101,15 +102,15 @@ bool RawCellMLViewPlugin::isEditorUseable(const QString &pFileName) const
 
 //==============================================================================
 
-bool RawCellMLViewPlugin::isEditorContentsModified(const QString &pFileName) const
+bool RawCellMLViewPlugin::isEditorWidgetContentsModified(const QString &pFileName) const
 {
-    // Return whether the requested editor has been modified, which here is done
-    // by comparing its contents to that of the given file
+    // Return whether the requested editor widget has been modified, which here
+    // is done by comparing its contents to that of the given file
 
-    Editor::EditorWidget *crtEditor = editor(pFileName);
+    EditorWidget::EditorWidget *crtEditorWidget = editorWidget(pFileName);
 
-    return crtEditor?
-               Core::FileManager::instance()->isDifferent(pFileName, crtEditor->contents().toUtf8()):
+    return crtEditorWidget?
+               Core::FileManager::instance()->isDifferent(pFileName, crtEditorWidget->contents().toUtf8()):
                false;
 }
 
@@ -136,10 +137,10 @@ bool RawCellMLViewPlugin::saveFile(const QString &pOldFileName,
 
     // Save the given file
 
-    Editor::EditorWidget *crtEditor = editor(pOldFileName);
+    EditorWidget::EditorWidget *crtEditorWidget = editorWidget(pOldFileName);
 
-    return crtEditor?
-               Core::writeFileContentsToFile(pNewFileName, crtEditor->contents().toUtf8()):
+    return crtEditorWidget?
+               Core::writeFileContentsToFile(pNewFileName, crtEditorWidget->contents().toUtf8()):
                false;
 }
 
@@ -329,14 +330,10 @@ QWidget * RawCellMLViewPlugin::viewWidget(const QString &pFileName)
         return 0;
 
     // Update and return our raw CellML view widget using the given CellML file
-    // Note: we temporarily disable updates for our raw CellML view widget, so
-    //       as to avoid any risk of known/unknown/potential flickering...
 
-    mViewWidget->setUpdatesEnabled(false);
-        mViewWidget->initialize(pFileName);
-    mViewWidget->setUpdatesEnabled(true);
+    mViewWidget->initialize(pFileName);
 
-    return mViewWidget;
+    return mViewWidget->editingWidget(pFileName);
 }
 
 //==============================================================================

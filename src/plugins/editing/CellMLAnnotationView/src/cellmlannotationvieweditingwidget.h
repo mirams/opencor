@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// CellML annotation view editing widget
+// CellML Annotation view editing widget
 //==============================================================================
 
 #pragma once
@@ -51,9 +51,9 @@ namespace CellMLSupport {
 
 //==============================================================================
 
-namespace WebViewer {
+namespace WebViewerWidget {
     class WebViewerWidget;
-}   // namespace WebViewer
+}   // namespace WebViewerWidget
 
 //==============================================================================
 
@@ -99,17 +99,17 @@ private:
 
     QString mQualifierInformationTemplate;
 
-Q_SIGNALS:
+signals:
     void splitterMoved(const QIntList &pSizes);
 
-private Q_SLOTS:
+private slots:
     void emitSplitterMoved();
 
-    void updateWebViewerWithQualifierDetails(WebViewer::WebViewerWidget *pWebViewer,
+    void updateWebViewerWithQualifierDetails(WebViewerWidget::WebViewerWidget *pWebViewer,
                                              const QString &pQualifier);
-    void updateWebViewerWithResourceDetails(WebViewer::WebViewerWidget *pWebViewer,
+    void updateWebViewerWithResourceDetails(WebViewerWidget::WebViewerWidget *pWebViewer,
                                             const QString &pResource);
-    void updateWebViewerWithIdDetails(WebViewer::WebViewerWidget *pWebViewer,
+    void updateWebViewerWithIdDetails(WebViewerWidget::WebViewerWidget *pWebViewer,
                                       const QString &pResource,
                                       const QString &pId);
 };

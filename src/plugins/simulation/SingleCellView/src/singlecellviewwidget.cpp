@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// Single cell view widget
+// Single Cell view widget
 //==============================================================================
 
 #include "cellmlfilemanager.h"
@@ -249,19 +249,9 @@ void SingleCellViewWidget::initialize(const QString &pFileName)
 
         mSimulationWidget = new SingleCellViewSimulationWidget(mPlugin, pFileName, this);
 
-        // Keep track of our editing widget and add it to ourselves
+        // Keep track of our editing widget
 
         mSimulationWidgets.insert(pFileName, mSimulationWidget);
-
-        layout()->addWidget(mSimulationWidget);
-
-        // Load our simulation widget's settings
-
-        QSettings settings;
-
-        settings.beginGroup(mSettingsGroup);
-            mSimulationWidget->loadSettings(&settings);
-        settings.endGroup();
 
         // Initialise our simulation widget
 
@@ -306,13 +296,6 @@ void SingleCellViewWidget::initialize(const QString &pFileName)
     connect(mSimulationWidget->contentsWidget()->informationWidget()->parametersWidget()->header(), SIGNAL(sectionResized(int, int, int)),
             this, SLOT(parametersWidgetHeaderSectionResized(const int &, const int &, const int &)));
 
-    // Hide our previous simulation widget and show our new one
-
-    mSimulationWidget->show();
-
-    if (oldSimulationWidget && (mSimulationWidget != oldSimulationWidget))
-        oldSimulationWidget->hide();
-
     // Set our focus proxy to our 'new' simulation widget and make sure that the
     // latter immediately gets the focus
 
@@ -330,15 +313,6 @@ void SingleCellViewWidget::finalize(const QString &pFileName)
     SingleCellViewSimulationWidget *simulationWidget = mSimulationWidgets.value(pFileName);
 
     if (simulationWidget) {
-        // There is a simulation widget for the given file name, so save its
-        // settings and those of some of its contents' children, if needed
-
-        QSettings settings;
-
-        settings.beginGroup(mSettingsGroup);
-            simulationWidget->saveSettings(&settings);
-        settings.endGroup();
-
         // Finalise our simulation widget
 
         simulationWidget->finalize();
@@ -514,6 +488,15 @@ QStringList SingleCellViewWidget::fileNames() const
     // Return our file names
 
     return mFileNames;
+}
+
+//==============================================================================
+
+SingleCellViewSimulationWidget * SingleCellViewWidget::simulationWidget(const QString &pFileName) const
+{
+    // Return the simulation widget for the given file name
+
+    return mSimulationWidgets.value(pFileName);
 }
 
 //==============================================================================

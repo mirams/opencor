@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// CellMLAnnotationView plugin
+// CellML Annotation view plugin
 //==============================================================================
 
 #include "cellmlannotationvieweditingwidget.h"
@@ -47,7 +47,7 @@ PLUGININFO_FUNC CellMLAnnotationViewPluginInfo()
     descriptions.insert("fr", QString::fromUtf8("une extension pour annoter des fichiers CellML."));
 
     return new PluginInfo("Editing", true, false,
-                          QStringList() << "CellMLSupport" << "WebViewer",
+                          QStringList() << "CellMLSupport" << "WebViewerWidget",
                           descriptions);
 }
 
@@ -266,15 +266,10 @@ QWidget * CellMLAnnotationViewPlugin::viewWidget(const QString &pFileName)
 
     // Update and return our CellML annotation view widget using the given
     // CellML file
-    // Note: we temporarily disable updates for our CellML annotation view
-    //       widget, so as to avoid any risk of known/unknown/potential
-    //       flickering...
 
-    mViewWidget->setUpdatesEnabled(false);
-        mViewWidget->initialize(pFileName);
-    mViewWidget->setUpdatesEnabled(true);
+    mViewWidget->initialize(pFileName);
 
-    return mViewWidget;
+    return mViewWidget->editingWidget(pFileName);
 }
 
 //==============================================================================

@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// SEDMLSupport plugin
+// SED-ML support plugin
 //==============================================================================
 
 #pragma once
@@ -70,7 +70,7 @@ public:
 private:
     QAction *mFileNewSedmlFileAction;
 
-private Q_SLOTS:
+private slots:
     void newSedmlFile();
 };
 

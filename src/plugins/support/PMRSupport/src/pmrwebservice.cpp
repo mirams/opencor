@@ -381,7 +381,7 @@ void PmrWebService::finished(QNetworkReply *pNetworkReply)
                     break;
                 }
                 case ExposureFileInformation: {
-                    bool hasExposureFileInformation = true;
+                    bool hasExposureFileInformation = false;
                     QVariantList itemsList = collectionMap["items"].toList();
 
                     exposureUrl = mExposureUrls.value(url);
@@ -396,11 +396,38 @@ void PmrWebService::finished(QNetworkReply *pNetworkReply)
                             QString exposureFile = linksList.first().toMap()["href"].toString().trimmed();
 
                             if (!exposureFile.isEmpty()) {
+                                hasExposureFileInformation = true;
+
                                 exposureUrl = mExposureUrls.value(url);
 
                                 mExposureFileNames.insertMulti(exposureUrl, exposureFile);
 
                                 --mNumberOfExposureFileUrlsLeft;
+
+                                // Check whether the exposure file has a link
+                                // called "Launch with OpenCOR"
+
+                                foreach (const QVariant &linksVariant, collectionMap["links"].toList()) {
+                                    QVariantMap linksMap = linksVariant.toMap();
+                                    QString promptValue = linksMap["prompt"].toString();
+                                    QString relValue = linksMap["rel"].toString();
+
+                                    if (   !promptValue.compare("Launch with OpenCOR")
+                                        && !relValue.compare("section")) {
+                                        // Our exposure file has a link called
+                                        // "Launch with OpenCOR", so check
+                                        // whether its href value is already
+                                        // listed in our list of exposure files
+                                        // and, if not, then add it to it
+
+                                        exposureFile = linksMap["href"].toString().trimmed().remove("opencor://openFile/");
+
+                                        if (   !exposureFile.isEmpty()
+                                            && !mExposureFileNames.values(exposureUrl).contains(exposureFile)) {
+                                            mExposureFileNames.insertMulti(exposureUrl, exposureFile);
+                                        }
+                                    }
+                                }
 
                                 // Ask our widget to add our exposure files,
                                 // should we have no exposure file URL left to
@@ -415,11 +442,7 @@ void PmrWebService::finished(QNetworkReply *pNetworkReply)
                                     emit addExposureFiles(exposureUrl, exposureFileNames);
                                 }
                             }
-                        } else {
-                            hasExposureFileInformation = false;
                         }
-                    } else {
-                        hasExposureFileInformation = false;
                     }
 
                     if (!hasExposureFileInformation)
@@ -503,7 +526,7 @@ void PmrWebService::sslErrors(QNetworkReply *pNetworkReply,
 
 //==============================================================================
 
-void PmrWebService::requestExposuresList(void)
+void PmrWebService::requestExposuresList()
 {
     // Get the list of exposures from the PMR after making sure that our
     // internal data has been reset

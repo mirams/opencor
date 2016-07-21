@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// SingleCellView plugin
+// Single Cell view plugin
 //==============================================================================
 
 #include "cellmlfilemanager.h"
@@ -28,6 +28,7 @@ limitations under the License.
 #include "sedmlfilemanager.h"
 #include "sedmlsupportplugin.h"
 #include "singlecellviewplugin.h"
+#include "singlecellviewsimulationwidget.h"
 #include "singlecellviewwidget.h"
 
 //==============================================================================
@@ -50,7 +51,7 @@ PLUGININFO_FUNC SingleCellViewPluginInfo()
     descriptions.insert("fr", QString::fromUtf8("une extension pour exécuter des simulations unicellulaires."));
 
     return new PluginInfo("Simulation", true, false,
-                          QStringList() << "COMBINESupport"<< "Qwt" << "SEDMLSupport",
+                          QStringList() << "COMBINESupport"<< "GraphPanelWidget" << "Qwt" << "SEDMLSupport",
                           descriptions);
 }
 
@@ -326,14 +327,10 @@ QWidget * SingleCellViewPlugin::viewWidget(const QString &pFileName)
 
     // Update and return our simulation view widget using the given CellML file,
     // SED-ML file or COMBINE archive
-    // Note: we temporarily disable updates for our simulation view widget, so
-    //       as to avoid any risk of known/unknown/potential flickering...
 
-    mViewWidget->setUpdatesEnabled(false);
-        mViewWidget->initialize(pFileName);
-    mViewWidget->setUpdatesEnabled(true);
+    mViewWidget->initialize(pFileName);
 
-    return mViewWidget;
+    return mViewWidget->simulationWidget(pFileName);
 }
 
 //==============================================================================

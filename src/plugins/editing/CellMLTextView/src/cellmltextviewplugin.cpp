@@ -17,9 +17,10 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// CellMLTextView plugin
+// CellML Text view plugin
 //==============================================================================
 
+#include "cellmleditingviewwidget.h"
 #include "cellmlfilemanager.h"
 #include "cellmlsupportplugin.h"
 #include "cellmltextviewplugin.h"
@@ -44,11 +45,11 @@ PLUGININFO_FUNC CellMLTextViewPluginInfo()
 {
     Descriptions descriptions;
 
-    descriptions.insert("en", QString::fromUtf8("a plugin to edit <a href=\"http://www.cellml.org/\">CellML</a> files using an XML editor."));
-    descriptions.insert("fr", QString::fromUtf8("une extension pour éditer des fichiers <a href=\"http://www.cellml.org/\">CellML</a> à l'aide d'un éditeur XML."));
+    descriptions.insert("en", QString::fromUtf8("a plugin to edit <a href=\"http://www.cellml.org/\">CellML</a> files using the CellML Text format."));
+    descriptions.insert("fr", QString::fromUtf8("une extension pour éditer des fichiers <a href=\"http://www.cellml.org/\">CellML</a> à l'aide du format CellML Text."));
 
     return new PluginInfo("Editing", true, true,
-                          QStringList() << "CoreCellMLEditing",
+                          QStringList() << "CellMLEditingView",
                           descriptions);
 }
 
@@ -113,29 +114,30 @@ int CellMLTextViewPlugin::executeCommand(const QString &pCommand,
 // Editing interface
 //==============================================================================
 
-Editor::EditorWidget * CellMLTextViewPlugin::editor(const QString &pFileName) const
+EditorWidget::EditorWidget * CellMLTextViewPlugin::editorWidget(const QString &pFileName) const
 {
-    // Return the requested editor
+    // Return the requested editor widget
 
-    return mViewWidget->editor(pFileName);
+    return mViewWidget->editorWidget(pFileName);
 }
 
 //==============================================================================
 
-bool CellMLTextViewPlugin::isEditorUseable(const QString &pFileName) const
+bool CellMLTextViewPlugin::isEditorWidgetUseable(const QString &pFileName) const
 {
-    // Return whether the requested editor is useable
+    // Return whether the requested editor widget is useable
 
-    return mViewWidget->isEditorUseable(pFileName);
+    return mViewWidget->isEditorWidgetUseable(pFileName);
 }
 
 //==============================================================================
 
-bool CellMLTextViewPlugin::isEditorContentsModified(const QString &pFileName) const
+bool CellMLTextViewPlugin::isEditorWidgetContentsModified(const QString &pFileName) const
 {
-    // Return whether the contents of the requested editor has been modified
+    // Return whether the contents of the requested editor widget has been
+    // modified
 
-    return mViewWidget->isEditorContentsModified(pFileName);
+    return mViewWidget->isEditorWidgetContentsModified(pFileName);
 }
 
 //==============================================================================
@@ -349,14 +351,10 @@ QWidget * CellMLTextViewPlugin::viewWidget(const QString &pFileName)
 
     // Update and return our CellML text view widget using the given CellML
     // file
-    // Note: we temporarily disable updates for our CellML text view widget, so
-    //       as to avoid any risk of known/unknown/potential flickering...
 
-    mViewWidget->setUpdatesEnabled(false);
-        mViewWidget->initialize(pFileName);
-    mViewWidget->setUpdatesEnabled(true);
+    mViewWidget->initialize(pFileName);
 
-    return mViewWidget;
+    return mViewWidget->editingWidget(pFileName);
 }
 
 //==============================================================================
@@ -452,7 +450,7 @@ int CellMLTextViewPlugin::importExport(const QStringList &pArguments,
                                                                 .arg(message.message());
                 }
             } else {
-                std::cout << QString(OpenCOR::Core::serialiseDomDocument(parser.domDocument())).toUtf8().constData();
+                std::cout << QString(Core::serialiseDomDocument(parser.domDocument())).toUtf8().constData();
             }
         }
     }

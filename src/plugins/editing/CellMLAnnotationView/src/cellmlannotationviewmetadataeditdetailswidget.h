@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// CellML annotation view metadata edit details widget
+// CellML Annotation view metadata edit details widget
 //==============================================================================
 
 #pragma once
@@ -59,9 +59,9 @@ namespace Core {
 
 //==============================================================================
 
-namespace WebViewer {
+namespace WebViewerWidget {
     class WebViewerWidget;
-}   // namespace WebViewer
+}   // namespace WebViewerWidget
 
 //==============================================================================
 
@@ -149,7 +149,7 @@ private:
     Core::UserMessageWidget *mOutputMessage;
 
     QString mOutputOntologicalTermsTemplate;
-    WebViewer::WebViewerWidget *mOutputOntologicalTerms;
+    WebViewerWidget::WebViewerWidget *mOutputOntologicalTerms;
 
     InformationType mInformationType;
 
@@ -191,18 +191,18 @@ private:
 
     bool isDirectTerm(const QString &pTerm) const;
 
-Q_SIGNALS:
+signals:
     void qualifierLookUpRequested(const QString &pQualifier);
     void resourceLookUpRequested(const QString &pResource);
     void idLookUpRequested(const QString &pResource, const QString &pId);
     void noLookUpRequested();
 
-public Q_SLOTS:
+public slots:
     void updateGui(iface::cellml_api::CellMLElement *pElement,
                    const bool &pResetItemsGui = false,
                    const bool &pFilePermissionsChanged = false);
 
-private Q_SLOTS:
+private slots:
     void copy();
 
     void disableLookUpInformation();

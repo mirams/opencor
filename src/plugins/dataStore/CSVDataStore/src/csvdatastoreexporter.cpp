@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// CSV data store exporter class
+// CSV data store exporter
 //==============================================================================
 
 #include "corecliutils.h"
@@ -43,8 +43,10 @@ CsvDataStoreExporter::CsvDataStoreExporter(const QString &pFileName,
 
 //==============================================================================
 
-void CsvDataStoreExporter::execute() const
+void CsvDataStoreExporter::execute(QString &pErrorMessage) const
 {
+    Q_UNUSED(pErrorMessage);
+
     // Header
 
     static const QString Header = "%1 (%2)";

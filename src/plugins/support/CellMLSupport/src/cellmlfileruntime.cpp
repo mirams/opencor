@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// CellML file runtime class
+// CellML file runtime
 //==============================================================================
 
 #include "cellmlfile.h"
@@ -472,6 +472,9 @@ void CellmlFileRuntime::reset(const bool &pRecreateCompilerEngine,
     if (pResetIssues)
         mIssues.clear();
 
+    if (!mParameters.contains(mVariableOfIntegration))
+        delete mVariableOfIntegration;
+
     foreach (CellmlFileRuntimeParameter *parameter, mParameters)
         delete parameter;
 
@@ -772,60 +775,66 @@ void CellmlFileRuntime::update()
         mCondVarCount     = mDaeCodeInformation->conditionVariableCount();
     }
 
-    // In the case of a CellML 1.1 file, retrieve all the variables defined or
-    // referenced in our main CellML file
-    // Note: indeed, when it comes to CellML 1.1 files, we only want to list the
-    //       parameters that are either defined or referenced in our main CellML
-    //       file. Not only does it make sense, but also only the variables
-    //       listed in a main CellML file can be referenced by SED-ML...
+    // Go through the variables defined or referenced in our main CellML file
+    // and do a mapping between the source of that variable and that variable
+    // itself
+    // Note: indeed, when it comes to (real) CellML 1.1 files (i.e. not CellML
+    //       1.1 files that don't import any components), we only want to list
+    //       the parameters that are either defined or referenced in our main
+    //       CellML file. Not only does it make sense, but also only the
+    //       parameters listed in a main CellML file can be referenced in
+    //       SED-ML...
 
-    CellMLSupport::CellmlFile::Version cellmlVersion = mCellmlFile->version();
     QMap<iface::cellml_api::CellMLVariable *, iface::cellml_api::CellMLVariable *> mainVariables = QMap<iface::cellml_api::CellMLVariable *, iface::cellml_api::CellMLVariable *>();
+    QList<iface::cellml_api::CellMLVariable *> realMainVariables = QList<iface::cellml_api::CellMLVariable *>();
+    ObjRef<iface::cellml_api::CellMLComponentSet> localComponents = model->localComponents();
+    ObjRef<iface::cellml_api::CellMLComponentIterator> localComponentsIter = localComponents->iterateComponents();
 
-    if (cellmlVersion != CellMLSupport::CellmlFile::Cellml_1_0) {
-        ObjRef<iface::cellml_api::CellMLComponentSet> localComponents = model->localComponents();
-        ObjRef<iface::cellml_api::CellMLComponentIterator> localComponentsIter = localComponents->iterateComponents();
+    for (ObjRef<iface::cellml_api::CellMLComponent> component = localComponentsIter->nextComponent();
+         component; component = localComponentsIter->nextComponent()) {
+        ObjRef<iface::cellml_api::CellMLVariableSet> variables = component->variables();
+        ObjRef<iface::cellml_api::CellMLVariableIterator> variablesIter = variables->iterateVariables();
 
-        for (ObjRef<iface::cellml_api::CellMLComponent> component = localComponentsIter->nextComponent();
-             component; component = localComponentsIter->nextComponent()) {
-            ObjRef<iface::cellml_api::CellMLVariableSet> variables = component->variables();
-            ObjRef<iface::cellml_api::CellMLVariableIterator> variablesIter = variables->iterateVariables();
+        for (ObjRef<iface::cellml_api::CellMLVariable> variable = variablesIter->nextVariable();
+             variable; variable = variablesIter->nextVariable()) {
+            ObjRef<iface::cellml_api::CellMLVariable> sourceVariable = variable->sourceVariable();
 
-            for (ObjRef<iface::cellml_api::CellMLVariable> variable = variablesIter->nextVariable();
-                 variable; variable = variablesIter->nextVariable()) {
-                ObjRef<iface::cellml_api::CellMLVariable> sourceVariable = variable->sourceVariable();
+            mainVariables.insert(sourceVariable, variable);
 
-                mainVariables.insert(sourceVariable, variable);
-            }
+            // In CellML 1.0 models / some CellML 1.1 models, the source
+            // variable is / may be defined in the main CellML file and may be
+            // used (and therefore referenced) in different places in that same
+            // main CellML file, in which case we need to keep track of the real
+            // main variable, which is the one which source variable is the same
+
+            if (variable == sourceVariable)
+                realMainVariables << variable;
         }
     }
 
-    // Retrieve all the parameters and sort them by component/variable name
+    // Go through all our computation targets and determine which ones are
+    // referenced in our main CellML file, and sort them by component and
+    // variable name
 
     ObjRef<iface::cellml_services::ComputationTargetIterator> computationTargetIter = genericCodeInformation->iterateTargets();
 
     for (ObjRef<iface::cellml_services::ComputationTarget> computationTarget = computationTargetIter->nextComputationTarget();
          computationTarget; computationTarget = computationTargetIter->nextComputationTarget()) {
-        // Make sure that the parameter is defined or referenced in our main
-        // CellML file
+        // Make sure that our computation target is defined or referenced in our
+        // main CellML file, if it has imports
 
         ObjRef<iface::cellml_api::CellMLVariable> variable = computationTarget->variable();
-        iface::cellml_api::CellMLVariable *mainVariable = variable;
-        iface::cellml_api::CellMLVariable *realVariable = variable;
-
-        if (cellmlVersion != CellMLSupport::CellmlFile::Cellml_1_0) {
-            mainVariable = mainVariables.value(variable);
-
-            if (mainVariable)
-                realVariable = mainVariable;
-        }
+        iface::cellml_api::CellMLVariable *mainVariable = realMainVariables.contains(variable)?
+                                                              variable.getPointer():
+                                                              mainVariables.value(variable);
+        iface::cellml_api::CellMLVariable *realVariable = mainVariable?mainVariable:variable.getPointer();
 
         if (   !mainVariable
             &&  (computationTarget->type() != iface::cellml_services::VARIABLE_OF_INTEGRATION)) {
             continue;
         }
 
-        // Determine the type of the parameter
+        // Determine the type of our computation target
 
         CellmlFileRuntimeParameter::ParameterType parameterType;
 
@@ -890,7 +899,7 @@ void CellmlFileRuntime::update()
             break;
         }
 
-        // Keep track of the parameter, should its type be of interest
+        // Keep track of our computation target, should its type be of interest
 
         if (   (parameterType != CellmlFileRuntimeParameter::Floating)
             && (parameterType != CellmlFileRuntimeParameter::LocallyBound)) {
@@ -904,7 +913,7 @@ void CellmlFileRuntime::update()
             if (parameterType == CellmlFileRuntimeParameter::Voi)
                 mVariableOfIntegration = parameter;
 
-            if (mainVariable == variable)
+            if (realVariable == mainVariable)
                 mParameters << parameter;
         }
     }

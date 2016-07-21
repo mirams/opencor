@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// Single cell view information parameters widget
+// Single Cell view information parameters widget
 //==============================================================================
 
 #pragma once
@@ -70,6 +70,9 @@ private:
 
     SingleCellViewSimulation *mSimulation;
 
+    bool mNeedClearing;
+    bool mVoiAccessible;
+
     void populateModel(CellMLSupport::CellmlFileRuntime *pRuntime);
     void populateContextMenu(CellMLSupport::CellmlFileRuntime *pRuntime);
 
@@ -77,15 +80,14 @@ private:
 
     void retranslateContextMenu();
 
-Q_SIGNALS:
+signals:
     void graphRequired(CellMLSupport::CellmlFileRuntimeParameter *pParameterX,
                        CellMLSupport::CellmlFileRuntimeParameter *pParameterY);
 
-public Q_SLOTS:
-    void updateParameters(const double &pCurrentPoint,
-                          const bool &pProcessEvents = false);
+public slots:
+    void updateParameters(const double &pCurrentPoint);
 
-private Q_SLOTS:
+private slots:
     void propertyEditorContextMenu(const QPoint &pPosition) const;
 
     void propertyChanged(Core::Property *pProperty);

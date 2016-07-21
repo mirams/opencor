@@ -17,7 +17,7 @@ limitations under the License.
 *******************************************************************************/
 
 //==============================================================================
-// CellML annotation view metadata normal view details widget
+// CellML Annotation view metadata normal view details widget
 //==============================================================================
 
 #pragma once
@@ -49,9 +49,9 @@ namespace Core {
 
 //==============================================================================
 
-namespace WebViewer {
+namespace WebViewerWidget {
     class WebViewerWidget;
-}   // namespace WebViewer
+}   // namespace WebViewerWidget
 
 //==============================================================================
 
@@ -105,7 +105,7 @@ private:
     Core::UserMessageWidget *mOutputMessage;
 
     QString mOutputOntologicalTermsTemplate;
-    WebViewer::WebViewerWidget *mOutputOntologicalTerms;
+    WebViewerWidget::WebViewerWidget *mOutputOntologicalTerms;
 
     ObjRef<iface::cellml_api::CellMLElement> mElement;
 
@@ -139,7 +139,7 @@ private:
     void genericLookUp(const QString &pRdfTripleInformation = QString(),
                        const InformationType &pInformationType = None);
 
-Q_SIGNALS:
+signals:
     void qualifierLookUpRequested(const QString &pQualifier);
     void resourceLookUpRequested(const QString &pResource);
     void idLookUpRequested(const QString &pResource, const QString &pId);
@@ -147,7 +147,7 @@ Q_SIGNALS:
 
     void rdfTripleRemoved(CellMLSupport::CellmlFileRdfTriple *pRdfTriple);
 
-private Q_SLOTS:
+private slots:
     void copy();
 
     void disableLookUpInformation();

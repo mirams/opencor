@@ -1,5 +1,5 @@
 var jsonData = { "versions": [
-                   { "anchor": "latest", "description": "Latest snapshot", "day": 9, "month": 6, "year": 2016,
+                   { "anchor": "latest", "description": "Latest snapshot", "day": 1, "month": 7, "year": 2016,
                      "categories": [
                        { "name": "General",
                          "entries": [
@@ -58,6 +58,7 @@ var jsonData = { "versions": [
                              "entries": [
                                { "type": "Added", "description": "Support for the <code>min()</code> and <code>max()</code> functions." },
                                { "type": "Added", "description": "Support for the <code>gcd()</code> and <code>lcm()</code> functions." },
+                               { "type": "Added", "description": "Save the contents of the view to a text file if it cannot be saved as a <a href=\"https://www.cellml.org/\">CellML</a> file." },
                                { "type": "Improved", "description": "Syntax highlighting." },
                                { "type": "Improved", "description": "cmeta:id's support by allowing hyphens and periods." },
                                { "type": "Improved", "description": "Comments support by allowing comments before a model definition." },
@@ -73,6 +74,7 @@ var jsonData = { "versions": [
                          "entries": [
                            { "type": "subCategory", "name": "Physiome Model Repository window (formerly known as the CellML Model Repository window)",
                              "entries": [
+                               { "type": "Added", "description": "Listing of <a href=\"http://www.sed-ml.org/\">SED-ML</a> files." },
                                { "type": "Added", "description": "Cloning of a workspace." },
                                { "type": "Added", "description": "Open a file from a published exposure." }
                              ]
@@ -85,6 +87,8 @@ var jsonData = { "versions": [
                              "entries": [
                                { "type": "Added", "description": "Basic <a href=\"http://www.sed-ml.org/\">SED-ML</a> support (either through a SED-ML file or a <a href=\"http://co.mbine.org/documents/archive\">COMBINE archive</a>)." },
                                { "type": "Added", "description": "Create a new or update an existing <a href=\"https://www.cellml.org/\">CellML</a> file based on the results of a simulation." },
+                               { "type": "Added", "description": "Specify the minimum/maximum values of the axes of a graph panel." },
+                               { "type": "Added", "description": "Synchronise the X and/or Y axes of all the graph panels." },
                                { "type": "Improved", "description": "<a href=\"https://en.wikipedia.org/wiki/Graphical_user_interface\">GUI</a> rendering." },
                                { "type": "Improved", "description": "Plotting of simulation data." },
                                { "type": "Improved", "description": "Support for <a href=\"https://www.cellml.org/\">CellML</a> models." },
@@ -119,7 +123,7 @@ var jsonData = { "versions": [
                            }
                          ]
                        },
-                       { "name": "Tool",
+                       { "name": "Tools",
                          "entries": [
                            { "type": "subCategory", "name": "CellML tools",
                              "entries": [
@@ -271,7 +275,7 @@ var jsonData = { "versions": [
                            { "type": "Added", "description": "(Un)lock a file." },
                            { "type": "Added", "description": "Close a file by pressing <code>Ctrl+W</code> on <a href=\"https://en.wikipedia.org/wiki/Microsoft_Windows\">Windows</a>." },
                            { "type": "Improved", "description": "<a href=\"https://en.wikipedia.org/wiki/Command-line_interface\">CLI</a> support on <a href=\"https://en.wikipedia.org/wiki/Linux\">Linux</a> and <a href=\"https://en.wikipedia.org/wiki/OS_X\">OS X</a>." },
-                           { "type": "Improved", "description": "<a href=\"userInterfaces/commandLineInterface.html\">CLI</a> with improved <a href=\"plugins/miscellaneous/CellMLTools.html\">CellML tools</a>." },
+                           { "type": "Improved", "description": "<a href=\"userInterfaces/commandLineInterface.html\">CLI</a> with improved <a href=\"plugins/tools/CellMLTools.html\">CellML tools</a>." },
                            { "type": "Improved", "description": "<a href=\"https://en.wikipedia.org/wiki/Graphical_user_interface\">GUI</a> support." },
                            { "type": "Improved", "description": "Plugin framework." },
                            { "type": "Improved", "description": "Plugins window." },
@@ -379,7 +383,7 @@ var jsonData = { "versions": [
                            { "type": "Added", "description": "Show/hide all the recent/current docked widgets at once." },
                            { "type": "Added", "description": "<a href=\"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1359535/\">Noble 1962</a> as one of the <a href=\"https://www.cellml.org/\">CellML</a> file examples." },
                            { "type": "Improved", "description": "Keyboard navigation in tree views." },
-                           { "type": "Improved", "description": "<a href=\"userInterfaces/commandLineInterface.html\">CLI</a> with <a href=\"plugins/miscellaneous/CellMLTools.html\">CellML tools</a>." },
+                           { "type": "Improved", "description": "<a href=\"userInterfaces/commandLineInterface.html\">CLI</a> with <a href=\"plugins/tools/CellMLTools.html\">CellML tools</a>." },
                            { "type": "Improved", "description": "Plugins window." },
                            { "type": "Improved", "description": "File handling." }
                          ]
@@ -395,7 +399,7 @@ var jsonData = { "versions": [
                        },
                        { "name": "Miscellaneous",
                          "entries": [
-                           { "type": "Added", "description": "<a href=\"plugins/miscellaneous/CellMLTools.html\">CellML tools</a>." }
+                           { "type": "Added", "description": "<a href=\"plugins/tools/CellMLTools.html\">CellML tools</a>." }
                          ]
                        },
                        { "name": "Organisation",
